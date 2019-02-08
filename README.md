@@ -1,57 +1,50 @@
-VQA
-==============================
-
-Relational question answering on the CLEVR dataset
-
-Project Organization
-------------
-
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+# VQA-on-CLEVR-dataset
 
 
---------
+VISUAL QUESTION ANSWERING
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+INTRODUCTION
+The dataset provided is a modification of the CLEVR dataset. It consists of a collection of synthesized images and a set of questions associated with each image. Your task is to predict the answers to these questions. It has about 15000 images and 135000 questions and answers for training. Most images have about 10 questions associated with them, however, some images don’t have any questions associated with them.The images contain simple 3D objects with each object having one of the 96 property profiles obtained by picking one choice each from the following four types:
+Shape: Sphere, Cube, Cylinder
+Size: Large, Small
+Material: (Matte) Rubber, (Shiny) Metal
+Color: Gray, Cyan, Blue, Purple, Brown… (8 colors)
+
+The questions test the understanding regarding the various type of relationships between these objects. The relationships include the understanding of the position relative to the other objects i.e which of two objects lies to the left/right of the other or which of the two objects lies in front of/behind the other. 
+For addressing the task at hand,we have trained the dataset on three different models and chosen the model with the best relative accuracy score. Model architectures used are:
+1.  CNN-LSTM model
+2.  CNN –LSTM model with Stacked Attention
+
+
+CNN –LSTM Model
+Pretrained 50-d GloVe embeddings have been used for the embedding layer of LSTM
+CNN head outputs 16 feature maps of size 8x8
+The question vector and flatten image vector are concatenated and fed into a series of dense layers
+
+![image1](https://user-images.githubusercontent.com/28951885/52464172-e7302f80-2b9f-11e9-906b-e3679035e1ea.jpg)
+
+
+
+
+CNN –LSTM Model with Stacked Attention
+This model is a Keras implementation of the model proposed in the paper : 
+Stacked Attention Networks for Image Question Answering.
+Link to the paper :
+https://www.cvfoundation.org/openaccess/content_cvpr_2016/papers/Yang_Stacked_Attention_Networks_CVPR_2016_paper.pdf
+As in the paper,we have used 2 attention layers to capture region-wise relations between the objects in the image and objects referred to in the question.
+
+![unnamed](https://user-images.githubusercontent.com/28951885/52464179-eac3b680-2b9f-11e9-9d98-7357092f4c38.png)
+
+
+
+
+
+![attn24](https://user-images.githubusercontent.com/28951885/52464173-e8615c80-2b9f-11e9-82a8-469b6e9d485e.jpg)
+
+
+
+
+To find the optimum parameters We tried to implement the Grid Search on the various the various hyper-parameters like number of dense units ,epochs,learning rate,etc . however later we came to know that one can’t apply gridsearch on multi-input models like the ones being used to solve the given problem statement. Thus various parameters like epochs,learning rate were manually tested by running various models and analysing the results. It was found that the optimizer Adadelta() at the default parameters preformed the best among the various other parameters like Adam, SGD , etc.  
+
+
